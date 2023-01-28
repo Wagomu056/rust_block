@@ -1,0 +1,5 @@
+[[target]]
+    name = "rust_block"
+    assets = [
+        "assets/images/bullet.png",
+    ]
