@@ -1,6 +1,5 @@
 use anyhow::Error;
 use crankstart::graphics::{Graphics, rect_make};
-use crankstart::log_to_console;
 use crankstart::sprite::{Sprite, SpriteManager};
 use crankstart_sys::LCDBitmapFlip;
 use crankstart_sys::{LCD_COLUMNS, LCD_ROWS};
