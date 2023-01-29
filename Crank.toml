@@ -2,4 +2,5 @@
     name = "rust_block"
     assets = [
         "assets/images/bullet.png",
+        "assets/images/player_board.png",
     ]

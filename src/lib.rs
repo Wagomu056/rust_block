@@ -1,6 +1,7 @@
 #![no_std]
 
 mod ball_handler;
+mod player_handler;
 
 extern crate alloc;
 
@@ -21,9 +22,11 @@ use {
     //euclid::{point2, vec2},
 };
 use crate::ball_handler::BallHandler;
+use crate::player_handler::PlayerHandler;
 
 struct State {
     ball_handler: BallHandler,
+    player_handler: PlayerHandler,
 }
 
 impl State {
@@ -32,9 +35,11 @@ impl State {
 
         // setup ball
         let ball_handler = BallHandler::create()?;
+        let player_handler = PlayerHandler::new()?;
 
         Ok(Box::new(Self {
             ball_handler,
+            player_handler,
         }))
     }
 }
@@ -56,7 +61,7 @@ impl Game for State {
 
     fn update(&mut self, _playdate: &mut Playdate) -> Result<(), Error> {
         self.ball_handler.update()?;
-
+        self.player_handler.update()?;
 
         Ok(())
     }
