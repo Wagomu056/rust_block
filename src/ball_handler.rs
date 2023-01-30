@@ -1,10 +1,19 @@
 use anyhow::Error;
+use alloc::{boxed::Box};
 use crankstart::graphics::{Graphics, rect_make};
-use crankstart::sprite::{Sprite, SpriteManager};
-use crankstart_sys::LCDBitmapFlip;
+use crankstart::sprite::{Sprite, SpriteCollider, SpriteManager};
+use crankstart_sys::{LCDBitmapFlip, SpriteCollisionResponseType};
 use crankstart_sys::{LCD_COLUMNS, LCD_ROWS};
 use euclid::{vec2, Vector2D};
 
+#[derive(Debug)]
+struct OverlapCollider;
+
+impl SpriteCollider for OverlapCollider {
+    fn response_type(&self, _: Sprite, _: Sprite) -> SpriteCollisionResponseType {
+        SpriteCollisionResponseType::kCollisionTypeOverlap
+    }
+}
 
 pub struct BallHandler {
     ball_sprite: Sprite,
@@ -31,6 +40,7 @@ impl BallHandler {
 
         ball.set_image(ball_image, LCDBitmapFlip::kBitmapUnflipped)?;
         ball.set_collide_rect(&cr)?;
+        ball.set_collision_response_type(Some(Box::new(OverlapCollider {})))?;
         ball.move_to( 100.0, 100.0 )?;
         sprite_manager.add_sprite(&ball)?;
 
@@ -64,9 +74,20 @@ impl BallHandler {
         }
 
         self.pos = new_pos;
-        self.ball_sprite.move_to(
-            self.pos.x, self.pos.y)?;
+        let (_, hit_y, collisions) =
+            self.ball_sprite.move_with_collisions(
+                self.pos.x, self.pos.y)?;
+
+        for _ in collisions.iter() {
+            if hit_y > self.pos.y {
+                continue;
+            }
+            if self.vel.y > 0.0 {
+                self.vel.y *= -1.0;
+            }
+        }
         Ok(())
     }
+
 }
 
