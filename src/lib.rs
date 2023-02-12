@@ -2,6 +2,7 @@
 
 mod ball_handler;
 mod player_handler;
+mod block_handler;
 
 extern crate alloc;
 
@@ -22,11 +23,13 @@ use {
     //euclid::{point2, vec2},
 };
 use crate::ball_handler::BallHandler;
+use crate::block_handler::BlockHandler;
 use crate::player_handler::PlayerHandler;
 
 struct State {
     ball_handler: BallHandler,
     player_handler: PlayerHandler,
+    block_handler: BlockHandler,
 }
 
 impl State {
@@ -36,10 +39,12 @@ impl State {
         // setup ball
         let ball_handler = BallHandler::create()?;
         let player_handler = PlayerHandler::new()?;
+        let block_handler = BlockHandler::new()?;
 
         Ok(Box::new(Self {
             ball_handler,
             player_handler,
+            block_handler,
         }))
     }
 }
