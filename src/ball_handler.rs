@@ -1,10 +1,12 @@
 use anyhow::Error;
 use alloc::{boxed::Box};
 use crankstart::graphics::{Graphics, rect_make};
+use crankstart::log_to_console;
 use crankstart::sprite::{Sprite, SpriteCollider, SpriteManager};
 use crankstart_sys::{LCDBitmapFlip, SpriteCollisionResponseType};
 use crankstart_sys::{LCD_COLUMNS, LCD_ROWS};
 use euclid::{vec2, Vector2D};
+use crate::sprite_type::SpriteType;
 
 #[derive(Debug)]
 struct OverlapCollider;
@@ -19,6 +21,7 @@ pub struct BallHandler {
     ball_sprite: Sprite,
     pos: Vector2D<f32, f32>,
     vel: Vector2D<f32, f32>,
+    hit_skip_frame: u32,
 }
 
 impl BallHandler {
@@ -49,6 +52,7 @@ impl BallHandler {
                 ball_sprite: ball,
                 pos: vec2(100.0, 100.0),
                 vel: vec2(5.0, 5.0),
+                hit_skip_frame: 0,
                 //vel: vec2(0.0, 3.0),
             }
         )
@@ -78,13 +82,32 @@ impl BallHandler {
             self.ball_sprite.move_with_collisions(
                 self.pos.x, self.pos.y)?;
 
-        for _ in collisions.iter() {
-            if hit_y > self.pos.y {
-                continue;
+        for collision in collisions.iter() {
+            let tag = collision.other.get_tag()?;
+            if tag == SpriteType::Player as u8 {
+                if hit_y > self.pos.y {
+                    continue;
+                }
+                if self.vel.y > 0.0 {
+                    self.vel.y *= -1.0;
+                }
             }
-            if self.vel.y > 0.0 {
-                self.vel.y *= -1.0;
+            else {
+                if self.hit_skip_frame == 0 {
+                    let normal = collision.info.normal;
+                    if normal.y != 0 {
+                        self.vel.y *= -1.0;
+                    }
+                    else if normal.x != 0 {
+                        self.vel.x *= -1.0;
+                    }
+                }
+                self.hit_skip_frame = 3;
             }
+        }
+
+        if self.hit_skip_frame > 0 {
+            self.hit_skip_frame -= 1;
         }
         Ok(())
     }

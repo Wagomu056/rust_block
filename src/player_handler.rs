@@ -5,6 +5,7 @@ use crankstart::system::System;
 use crankstart_sys::{LCDBitmapFlip, PDButtons};
 use crankstart_sys::{LCD_COLUMNS, LCD_ROWS};
 use euclid::{vec2, Vector2D};
+use crate::sprite_type;
 
 pub struct PlayerHandler {
     player_sprite: Sprite,
@@ -31,6 +32,7 @@ impl PlayerHandler {
 
         player.set_image(player_image, LCDBitmapFlip::kBitmapUnflipped)?;
         player.set_collide_rect(&cr)?;
+        player.set_tag(sprite_type::SpriteType::Player as u8)?;
 
         let center_x = LCD_COLUMNS as f32 * 0.5;
         let start_y = LCD_ROWS as f32 - 25.0;

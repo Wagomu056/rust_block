@@ -3,6 +3,7 @@
 mod ball_handler;
 mod player_handler;
 mod block_handler;
+mod sprite_type;
 
 extern crate alloc;
 

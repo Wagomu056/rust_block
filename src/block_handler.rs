@@ -6,6 +6,7 @@ use crankstart::system::System;
 use crankstart_sys::{LCDBitmapFlip, PDButtons};
 use crankstart_sys::{LCD_COLUMNS, LCD_ROWS};
 use euclid::{vec2, Vector2D};
+use crate::sprite_type;
 
 const x_num : i32 = 7;
 const y_num : i32 = 5;
@@ -50,6 +51,8 @@ impl BlockHandler {
                 let pos_x = start_x + image_size.x * x as f32 + half_image_size.x;
                 let pos_y = start_y + image_size.y * y as f32 + half_image_size.y;
                 sprite.move_to(pos_x, pos_y)?;
+                sprite.set_tag(sprite_type::SpriteType::Block as u8)?;
+
                 sprite_manager.add_sprite(&sprite)?;
 
                 sprites.push(sprite);
