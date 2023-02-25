@@ -7,7 +7,6 @@ mod sprite_type;
 
 extern crate alloc;
 
-use crankstart::log_to_console;
 use crankstart_sys::{PDRect};
 use {
     alloc::boxed::Box,
@@ -71,7 +70,7 @@ impl Game for State {
 
         let result = self.ball_handler.update();
         if let Ok(sprites) = result {
-            self.block_handler.removeSprites(sprites);
+            self.block_handler.remove_sprites(sprites);
         }
 
         Ok(())

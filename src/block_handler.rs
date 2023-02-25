@@ -1,23 +1,18 @@
 use alloc::vec::Vec;
 use anyhow::Error;
 use crankstart::graphics::{Graphics, rect_make};
-use crankstart::log_to_console;
 use crankstart::sprite::{Sprite, SpriteManager};
-use crankstart::system::System;
-use crankstart_sys::{LCDBitmapFlip, PDButtons};
-use crankstart_sys::{LCD_COLUMNS, LCD_ROWS};
+use crankstart_sys::{LCDBitmapFlip};
 use euclid::{vec2, Vector2D};
 use crate::sprite_type;
 
 extern crate alloc;
 
-const x_num : i32 = 7;
-const y_num : i32 = 5;
-const total_num : i32 = x_num * y_num;
+const X_NUM: i32 = 7;
+const Y_NUM: i32 = 5;
 
 pub struct BlockHandler {
     sprites: Vec<Sprite>,
-    positions: Vec<Vector2D<f32, f32>>,
 }
 
 impl BlockHandler {
@@ -36,12 +31,11 @@ impl BlockHandler {
             image_size.y * 0.5);
 
         let mut sprites: Vec<Sprite> = Vec::new();
-        let mut positions: Vec<Vector2D<f32, f32>> = Vec::new();
 
         let start_x = 25.0;
         let start_y = 25.0;
-        for y in 0..y_num {
-            for x in 0..x_num {
+        for y in 0..Y_NUM {
+            for x in 0..X_NUM {
                 let mut sprite = sprite_manager.new_sprite()?;
                 let cr = rect_make(
                     0.0, 0.0,
@@ -59,19 +53,17 @@ impl BlockHandler {
                 sprite_manager.add_sprite(&sprite)?;
 
                 sprites.push(sprite);
-                positions.push(vec2(pos_x, pos_y));
             }
         }
 
         Ok(
             BlockHandler {
                 sprites,
-                positions,
             }
         )
     }
 
-    pub fn removeSprites(&mut self, sprites: Vec<Sprite>) {
+    pub fn remove_sprites(&mut self, sprites: Vec<Sprite>) {
         for sprite in sprites {
             if let Some(pos) = self.sprites.iter().position(|s| *s == sprite) {
                 self.sprites.remove(pos);
