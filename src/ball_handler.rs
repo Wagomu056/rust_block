@@ -1,5 +1,6 @@
 use anyhow::Error;
 use alloc::{boxed::Box};
+use alloc::vec::Vec;
 use crankstart::graphics::{Graphics, rect_make};
 use crankstart::log_to_console;
 use crankstart::sprite::{Sprite, SpriteCollider, SpriteManager};
@@ -7,6 +8,8 @@ use crankstart_sys::{LCDBitmapFlip, SpriteCollisionResponseType};
 use crankstart_sys::{LCD_COLUMNS, LCD_ROWS};
 use euclid::{vec2, Vector2D};
 use crate::sprite_type::SpriteType;
+
+extern crate alloc;
 
 #[derive(Debug)]
 struct OverlapCollider;
@@ -58,7 +61,7 @@ impl BallHandler {
         )
     }
 
-    pub fn update(&mut self) -> Result<(), Error> {
+    pub fn update(&mut self) -> Result<Vec<Sprite>, Error> {
         let mut new_pos = self.pos + self.vel;
 
         let lim_x = LCD_COLUMNS as f32;
@@ -82,6 +85,7 @@ impl BallHandler {
             self.ball_sprite.move_with_collisions(
                 self.pos.x, self.pos.y)?;
 
+        let mut hitSprites = Vec::new();
         for collision in collisions.iter() {
             let tag = collision.other.get_tag()?;
             if tag == SpriteType::Player as u8 {
@@ -101,6 +105,7 @@ impl BallHandler {
                     else if normal.x != 0 {
                         self.vel.x *= -1.0;
                     }
+                    hitSprites.push(collision.other);
                 }
                 self.hit_skip_frame = 3;
             }
@@ -109,7 +114,7 @@ impl BallHandler {
         if self.hit_skip_frame > 0 {
             self.hit_skip_frame -= 1;
         }
-        Ok(())
+        Ok(hitSprites)
     }
 
 }

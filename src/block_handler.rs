@@ -1,12 +1,15 @@
 use alloc::vec::Vec;
 use anyhow::Error;
 use crankstart::graphics::{Graphics, rect_make};
+use crankstart::log_to_console;
 use crankstart::sprite::{Sprite, SpriteManager};
 use crankstart::system::System;
 use crankstart_sys::{LCDBitmapFlip, PDButtons};
 use crankstart_sys::{LCD_COLUMNS, LCD_ROWS};
 use euclid::{vec2, Vector2D};
 use crate::sprite_type;
+
+extern crate alloc;
 
 const x_num : i32 = 7;
 const y_num : i32 = 5;
@@ -66,6 +69,14 @@ impl BlockHandler {
                 positions,
             }
         )
+    }
+
+    pub fn removeSprites(&mut self, sprites: Vec<Sprite>) {
+        for sprite in sprites {
+            if let Some(pos) = self.sprites.iter().position(|s| *s == sprite) {
+                self.sprites.remove(pos);
+            }
+        }
     }
 }
 
