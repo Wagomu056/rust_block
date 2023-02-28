@@ -68,7 +68,7 @@ impl Game for State {
     fn update(&mut self, _playdate: &mut Playdate) -> Result<(), Error> {
         self.player_handler.update()?;
 
-        let result = self.ball_handler.update();
+        let result = self.ball_handler.update(&mut self.block_handler);
         if let Ok(sprites) = result {
             self.block_handler.remove_sprites(sprites);
         }

@@ -6,6 +6,7 @@ use crankstart::sprite::{Sprite, SpriteCollider, SpriteManager};
 use crankstart_sys::{LCDBitmapFlip, SpriteCollisionResponseType};
 use crankstart_sys::{LCD_COLUMNS, LCD_ROWS};
 use euclid::{vec2, Vector2D};
+use crate::block_handler::BlockHandler;
 use crate::sprite_type::SpriteType;
 
 extern crate alloc;
@@ -23,7 +24,7 @@ pub struct BallHandler {
     ball_sprite: Sprite,
     pos: Vector2D<f32, f32>,
     vel: Vector2D<f32, f32>,
-    hit_skip_frame: u32,
+    last_hit_block_id: u32,
 }
 
 impl BallHandler {
@@ -54,13 +55,12 @@ impl BallHandler {
                 ball_sprite: ball,
                 pos: vec2(100.0, 100.0),
                 vel: vec2(5.0, 5.0),
-                hit_skip_frame: 0,
-                //vel: vec2(0.0, 3.0),
+                last_hit_block_id: 4294967295,
             }
         )
     }
 
-    pub fn update(&mut self) -> Result<Vec<Sprite>, Error> {
+    pub fn update(&mut self, block_handler: &mut BlockHandler) -> Result<Vec<Sprite>, Error> {
         let mut new_pos = self.pos + self.vel;
 
         let lim_x = LCD_COLUMNS as f32;
@@ -96,7 +96,15 @@ impl BallHandler {
                 }
             }
             else {
-                if self.hit_skip_frame == 0 {
+                let will_hit;
+                match block_handler.get_id(&collision.other) {
+                    None => { will_hit = true; }
+                    Some(id) => {
+                        will_hit = id == self.last_hit_block_id;
+                        self.last_hit_block_id = id;
+                    }
+                }
+                if will_hit {
                     let normal = collision.info.normal;
                     if normal.y != 0 {
                         self.vel.y *= -1.0;
@@ -104,15 +112,16 @@ impl BallHandler {
                     else if normal.x != 0 {
                         self.vel.x *= -1.0;
                     }
+
                     hit_sprites.push(collision.other);
+
+                    //self.pos.x = collision.info.touch.x;
+                    //self.pos.y = collision.info.touch.y;
+                    //self.ball_sprite.move_to(self.pos.x, self.pos.y)?;
                 }
-                self.hit_skip_frame = 3;
             }
         }
 
-        if self.hit_skip_frame > 0 {
-            self.hit_skip_frame -= 1;
-        }
         Ok(hit_sprites)
     }
 

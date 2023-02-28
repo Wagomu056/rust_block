@@ -13,6 +13,7 @@ const Y_NUM: i32 = 5;
 
 pub struct BlockHandler {
     sprites: Vec<Sprite>,
+    id_vec: Vec<u32>,
 }
 
 impl BlockHandler {
@@ -31,7 +32,9 @@ impl BlockHandler {
             image_size.y * 0.5);
 
         let mut sprites: Vec<Sprite> = Vec::new();
+        let mut id_vec: Vec<u32> = Vec::new();
 
+        let mut id = 0;
         let start_x = 25.0;
         let start_y = 25.0;
         for y in 0..Y_NUM {
@@ -53,12 +56,15 @@ impl BlockHandler {
                 sprite_manager.add_sprite(&sprite)?;
 
                 sprites.push(sprite);
+                id_vec.push(id);
+                id += 1;
             }
         }
 
         Ok(
             BlockHandler {
                 sprites,
+                id_vec,
             }
         )
     }
@@ -68,6 +74,15 @@ impl BlockHandler {
             if let Some(pos) = self.sprites.iter().position(|s| *s == sprite) {
                 self.sprites.remove(pos);
             }
+        }
+    }
+
+    pub fn get_id(&mut self, sprite: &Sprite) -> Option<u32> {
+        match self.sprites.iter().position(|s| *s == *sprite) {
+            Some(pos) => {
+                Some(self.id_vec[pos])
+            }
+            None => None
         }
     }
 }
